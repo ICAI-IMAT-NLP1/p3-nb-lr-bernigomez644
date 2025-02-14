@@ -1,6 +1,8 @@
 from typing import List, Dict
 from collections import Counter
 import torch
+import re
+import string
 
 try:
     from src.utils import SentimentExample, tokenize
@@ -19,7 +21,18 @@ def read_sentiment_examples(infile: str) -> List[SentimentExample]:
         A list of SentimentExample objects parsed from the file.
     """
     # TODO: Open the file, go line by line, separate sentence and label, tokenize the sentence and create SentimentExample object
-    examples: List[SentimentExample] = None
+    examples: List[SentimentExample] = []
+
+    with open(infile, "r", encoding="utf-8") as file:
+        lines = file.readlines()
+        for line in lines:
+            separacion = line.strip().split("\t")
+            frase = separacion[0]
+            tokens = tokenize(frase)
+            label = int(separacion[-1])
+            sentiment_example = SentimentExample(tokens, label)
+            examples.append(sentiment_example)
+
     return examples
 
 
@@ -36,7 +49,14 @@ def build_vocab(examples: List[SentimentExample]) -> Dict[str, int]:
         Dict[str, int]: A dictionary representing the vocabulary, where each word is mapped to a unique index.
     """
     # TODO: Count unique words in all the examples from the training set
-    vocab: Dict[str, int] = None
+    vocab: Dict[str, int] = {}
+
+    palabras_unicas = set()
+    for example in examples:
+        palabras_unicas.update(example.words)
+
+    for index, palabra in enumerate(palabras_unicas):
+        vocab[palabra] = index
 
     return vocab
 
@@ -56,7 +76,14 @@ def bag_of_words(
     Returns:
         torch.Tensor: A tensor representing the bag-of-words vector.
     """
-    # TODO: Converts list of words into BoW, take into account the binary vs full
-    bow: torch.Tensor = None
 
+    # TODO: Converts list of words into BoW, take into account the binary vs full
+    bow: torch.Tensor = torch.zeros(len(vocab))
+    for palabra in text:
+        if palabra in vocab.keys():
+            index = vocab[palabra]
+            if binary:
+                bow[index] = 1
+            else:
+                bow[index] += 1
     return bow

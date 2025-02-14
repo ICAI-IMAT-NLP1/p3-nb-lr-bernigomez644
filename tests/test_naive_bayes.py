@@ -31,10 +31,12 @@ def test_estimate_conditional_probabilities():
     # Then
     assert isinstance(cond_probs, dict)
     assert all(isinstance(cond_probs[label], torch.Tensor) for label in cond_probs)
-    assert torch.allclose(cond_probs[0], torch.tensor([2 / 5, 2 / 5, 1 / 5], dtype=torch.float32))
-    assert torch.allclose(cond_probs[1], torch.tensor([1 / 5, 2 / 5, 2 / 5], dtype=torch.float32))
-    
-
+    assert torch.allclose(
+        cond_probs[0], torch.tensor([2 / 5, 2 / 5, 1 / 5], dtype=torch.float32)
+    )
+    assert torch.allclose(
+        cond_probs[1], torch.tensor([1 / 5, 2 / 5, 2 / 5], dtype=torch.float32)
+    )
 
 
 @pytest.mark.order(6)
@@ -76,7 +78,9 @@ def test_predict_proba_naive_bayes():
 
     # Then
     assert isinstance(probabilities, torch.Tensor)
-    assert torch.allclose(probabilities, torch.tensor([0.5, 0.5], dtype=torch.float32), atol=1e-2)
+    assert torch.allclose(
+        probabilities, torch.tensor([0.5, 0.5], dtype=torch.float32), atol=1e-2
+    )
     assert probabilities.dim() == 1
     assert torch.sum(probabilities).item() == pytest.approx(1.0)
 
@@ -85,5 +89,7 @@ def test_predict_proba_naive_bayes():
     probabilities = model.predict_proba(test_feature)
 
     # Then
-    assert torch.allclose(probabilities, torch.tensor([0.3333, 0.6667], dtype=torch.float32), atol=1e-2)
+    assert torch.allclose(
+        probabilities, torch.tensor([0.3333, 0.6667], dtype=torch.float32), atol=1e-2
+    )
     assert torch.sum(probabilities).item() == pytest.approx(1.0)
